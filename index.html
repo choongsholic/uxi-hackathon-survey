@@ -185,19 +185,6 @@ body {
 </head>
 <body>
 
-<!-- Netlify Forms: hidden form for bot detection -->
-<form name="hackathon-survey" data-netlify="true" netlify-honeypot="bot-field" hidden>
-  <input name="bot-field">
-  <input name="q1">
-  <input name="q2">
-  <input name="q3">
-  <input name="q4">
-  <input name="q3b">
-  <input name="q3c">
-  <input name="q5a">
-  <input name="q5">
-  <input name="sub">
-</form>
 
 <!-- Hero Visual -->
 <div class="hero-canvas-wrap">
@@ -500,47 +487,30 @@ body {
     btn.disabled = true;
     btn.textContent = '제출 중...';
 
-    // Build form data
-    const formData = new URLSearchParams();
-    formData.append('form-name', 'hackathon-survey');
+    // Build response data
+    const entry = {};
     requiredRadios.forEach(name => {
-      formData.append(name, document.querySelector(`input[name="${name}"]:checked`).value);
+      entry[name] = document.querySelector(`input[name="${name}"]:checked`).value;
     });
     const q4Values = Array.from(document.querySelectorAll('input[name="q4"]:checked')).map(el => el.value);
-    formData.append('q4', q4Values.join(', '));
-    formData.append('sub', document.querySelector('textarea[name="sub"]').value);
+    entry.q4 = q4Values.join(', ');
+    entry.sub = document.querySelector('textarea[name="sub"]').value;
 
     try {
-      const res = await fetch('/', {
+      const res = await fetch('/api/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString()
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
       });
-      if (res.ok) {
-        localStorage.setItem('survey_submitted', 'true');
-        document.getElementById('surveyForm').style.display = 'none';
-        document.getElementById('thankYou').style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        throw new Error('서버 오류');
-      }
-    } catch (err) {
-      // Netlify가 아닌 환경에서도 localStorage에 저장
-      const entry = { timestamp: new Date().toISOString() };
-      requiredRadios.forEach(name => {
-        entry[name] = document.querySelector(`input[name="${name}"]:checked`).value;
-      });
-      entry.q4 = q4Values.join(', ');
-      entry.sub = document.querySelector('textarea[name="sub"]').value;
-
-      const stored = JSON.parse(localStorage.getItem('survey_responses') || '[]');
-      stored.push(entry);
-      localStorage.setItem('survey_responses', JSON.stringify(stored));
+      if (!res.ok) throw new Error('서버 오류');
       localStorage.setItem('survey_submitted', 'true');
-
       document.getElementById('surveyForm').style.display = 'none';
       document.getElementById('thankYou').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      showToast('제출에 실패했습니다. 다시 시도해주세요.');
+      btn.disabled = false;
+      btn.textContent = '제출하기';
     }
   });
 
@@ -577,8 +547,12 @@ body {
     });
 
     // CSV download
-    document.getElementById('csvBtn').addEventListener('click', () => {
-      const responses = JSON.parse(localStorage.getItem('survey_responses') || '[]');
+    document.getElementById('csvBtn').addEventListener('click', async () => {
+      let responses = [];
+      try {
+        const res = await fetch('/api/responses');
+        if (res.ok) responses = await res.json();
+      } catch (e) { /* empty */ }
       if (!responses.length) { showToast('응답 데이터가 없습니다'); return; }
       const headers = ['timestamp','q1','q4','q5a','q2','q3b','q3','q3c','q5','sub'];
       let csv = headers.join(',') + '\n';
@@ -594,8 +568,12 @@ body {
     });
   }
 
-  function renderDashboard() {
-    const responses = JSON.parse(localStorage.getItem('survey_responses') || '[]');
+  async function renderDashboard() {
+    let responses = [];
+    try {
+      const res = await fetch('/api/responses');
+      if (res.ok) responses = await res.json();
+    } catch (e) { /* fallback empty */ }
     const total = responses.length;
 
     // Stats
