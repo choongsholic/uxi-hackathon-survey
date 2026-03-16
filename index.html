@@ -393,6 +393,14 @@ body {
     return;
   }
 
+  // ─── 결과보기 모달 (모든 화면에서 동작) ───
+  document.querySelectorAll('.show-admin-modal').forEach(link => {
+    link.addEventListener('click', () => {
+      document.getElementById('pwModal').classList.add('visible');
+      initAdmin();
+    });
+  });
+
   // ─── 중복 제출 방지 ───
   if (localStorage.getItem('survey_submitted')) {
     document.getElementById('loginGate').style.display = 'none';
@@ -423,13 +431,6 @@ body {
   loginInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryAccess(); });
   setTimeout(() => loginInput.focus(), 100);
 
-  // ─── 결과보기 → 모달 ───
-  document.querySelectorAll('.show-admin-modal').forEach(link => {
-    link.addEventListener('click', () => {
-      document.getElementById('pwModal').classList.add('visible');
-      initAdmin();
-    });
-  });
 
   // ─── Radio & Checkbox selection ───
   document.querySelectorAll('.option-item').forEach(item => {
