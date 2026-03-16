@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UXI 해커톤 후속 설문</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23111'/><text x='50' y='68' text-anchor='middle' font-family='-apple-system,BlinkMacSystemFont,sans-serif' font-size='48' font-weight='700' fill='white'>UXI</text></svg>" />
+<link href="https://img.hyundaicard.com/docfiles/resources/pc/css/reset.css" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Segoe UI', sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  min-height: 100vh;
+  padding: 0 0 80px;
+}
+
+.container { width: 100%; max-width: 640px; margin: 0 auto; padding: 0 20px; }
+
+/* Hero Visual */
+.hero-canvas-wrap {
+  position: relative; width: 100vw;
+  height: 280px; background: #000; overflow: hidden; margin-bottom: 32px;
+}
+#heroCanvas { display: block; width: 100%; height: 100%; }
+.hero-title-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; pointer-events: none;
+}
+.hero-title-overlay h1 {
+  font-family: 'YouandiNewKr', sans-serif; font-weight: 700;
+  font-size: clamp(20px, 4vw, 32px); color: #fff;
+  letter-spacing: -0.3px; text-shadow: 0 0 30px rgba(255,255,255,0.3);
+  margin: 0;
+}
+.hero-title-overlay p {
+  font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 8px;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+
+/* Header */
+.header { text-align: center; margin-bottom: 12px; }
+.header h1 { display: none; }
+.header-desc {
+  background: #fff; border-radius: 12px; padding: 20px 24px;
+  font-size: 14px; line-height: 1.7; color: #555;
+  text-align: left; border: 1px solid #e5e5e7; margin-bottom: 8px;
+}
+.header-desc strong { color: #1d1d1f; }
+
+/* Question Card */
+.q-card {
+  background: #fff; border-radius: 12px; border: 1px solid #e5e5e7;
+  padding: 28px; margin-top: 16px; transition: box-shadow 0.2s, border-color 0.3s;
+}
+.q-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.q-card.required .q-number::after { content: ' *'; color: #ff3b30; }
+.q-number { font-size: 11px; font-weight: 600; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.q-title { font-size: 16px; font-weight: 600; color: #1d1d1f; margin-bottom: 20px; line-height: 1.5; }
+.q-subtitle { font-size: 12px; color: #86868b; margin-top: -14px; margin-bottom: 18px; }
+
+/* Radio Options */
+.option-list { display: flex; flex-direction: column; gap: 10px; }
+.option-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: 10px; border: 1px solid #e5e5e7;
+  cursor: pointer; transition: all 0.2s; font-size: 14px; color: #3a3a3c; line-height: 1.4;
+}
+.option-item:hover { border-color: #c7c7cc; background: #fafafa; }
+.option-item.selected { border-color: #007aff; background: #f0f7ff; color: #1d1d1f; }
+.option-item input[type="radio"],
+.option-item input[type="checkbox"] { display: none; }
+
+/* Custom radio */
+.radio-mark {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid #c7c7cc;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.option-item.selected .radio-mark { border-color: #007aff; }
+.option-item.selected .radio-mark::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: #007aff; }
+
+/* Custom checkbox */
+.check-mark {
+  width: 20px; height: 20px; border-radius: 6px; border: 2px solid #c7c7cc;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; font-size: 12px; color: transparent;
+}
+.option-item.selected .check-mark { border-color: #007aff; background: #007aff; color: #fff; }
+
+/* Textarea */
+.q-textarea {
+  width: 100%; min-height: 100px; border: 1px solid #e5e5e7; border-radius: 10px;
+  padding: 14px 16px; font-family: inherit; font-size: 14px; color: #1d1d1f;
+  resize: vertical; outline: none; transition: border-color 0.2s; line-height: 1.6;
+}
+.q-textarea::placeholder { color: #c7c7cc; }
+.q-textarea:focus { border-color: #007aff; }
+
+/* Submit */
+.submit-section { margin-top: 32px; text-align: center; }
+.submit-btn {
+  background: #1d1d1f; color: #fff; border: none; padding: 14px 48px;
+  border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
+}
+.submit-btn:hover { background: #333; transform: translateY(-1px); }
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { background: #999; cursor: not-allowed; transform: none; }
+
+/* Footer */
+.footer { text-align: center; margin-top: 32px; padding-bottom: 120px; font-size: 11px; color: #86868b; }
+.footer strong { color: #555; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1d1d1f; color: #fff; padding: 14px 28px;
+  border-radius: 12px; font-size: 14px; font-weight: 500;
+  opacity: 0; transition: all 0.4s ease; z-index: 100; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* Thank you */
+.thank-you { display: none; text-align: center; padding: 80px 20px; }
+.thank-you h2 { font-size: 32px; font-weight: 700; margin-bottom: 16px; }
+.thank-you p { font-size: 16px; color: #555; line-height: 1.7; }
+
+/* Admin Dashboard */
+.admin-page { display: none; }
+.admin-page.visible { display: block; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.admin-header h2 { font-size: 22px; font-weight: 700; }
+.admin-badge { background: #f0f7ff; color: #007aff; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 8px; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: #fff; border: 1px solid #e5e5e7; border-radius: 12px; padding: 20px; text-align: center; }
+.stat-value { font-size: 32px; font-weight: 700; color: #1d1d1f; }
+.stat-label { font-size: 12px; color: #86868b; margin-top: 4px; }
+.chart-card { background: #fff; border: 1px solid #e5e5e7; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+.chart-title { font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 16px; }
+.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.bar-label { font-size: 13px; color: #3a3a3c; min-width: 200px; flex-shrink: 0; }
+.bar-track { flex: 1; height: 24px; background: #f5f5f7; border-radius: 6px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; background: #007aff; border-radius: 6px; transition: width 0.6s ease; min-width: 2px; }
+.bar-value { font-size: 12px; font-weight: 600; color: #86868b; min-width: 48px; text-align: right; }
+.text-responses { margin-top: 12px; }
+.text-response { background: #f9f9fb; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; font-size: 14px; line-height: 1.6; color: #3a3a3c; border-left: 3px solid #007aff; }
+.text-response.empty { color: #c7c7cc; font-style: italic; border-left-color: #e5e5e7; }
+.admin-actions { display: flex; gap: 10px; }
+.admin-btn { background: #fff; border: 1px solid #e5e5e7; color: #1d1d1f; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.admin-btn:hover { border-color: #1d1d1f; }
+
+/* Admin link */
+.admin-link { font-size: inherit; color: #c7c7cc; text-decoration: none; }
+.admin-link:hover { color: #86868b; text-decoration: underline; }
+
+/* Survey login gate */
+.login-gate { text-align: center; padding: 60px 20px 80px; }
+.login-gate .login-box { max-width: 360px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 40px 32px; border: 1px solid #e5e5e7; }
+.login-gate .login-box p { font-size: 14px; color: #86868b; margin-bottom: 24px; line-height: 1.6; }
+.login-input { width: 100%; padding: 14px 16px; border: 1px solid #e5e5e7; border-radius: 10px; font-size: 16px; font-family: inherit; outline: none; text-align: center; letter-spacing: 3px; font-weight: 600; }
+.login-input:focus { border-color: #007aff; }
+.login-submit { margin-top: 16px; width: 100%; background: #1d1d1f; color: #fff; border: none; padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
+.login-submit:hover { opacity: 0.85; }
+.login-error { color: #ff3b30; font-size: 12px; margin-top: 10px; display: none; }
+
+/* Password modal */
+.pw-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; align-items: center; justify-content: center; }
+.pw-modal.visible { display: flex; }
+.pw-box { background: #fff; border-radius: 16px; padding: 32px; width: 340px; text-align: center; }
+.pw-box h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.pw-box p { font-size: 13px; color: #86868b; margin-bottom: 20px; }
+.pw-input { width: 100%; padding: 12px 16px; border: 1px solid #e5e5e7; border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; text-align: center; letter-spacing: 2px; }
+.pw-input:focus { border-color: #007aff; }
+.pw-submit { margin-top: 16px; width: 100%; background: #1d1d1f; color: #fff; border: none; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.pw-error { color: #ff3b30; font-size: 12px; margin-top: 8px; display: none; }
+
+@media (max-width: 600px) {
+  .stat-grid { grid-template-columns: 1fr; }
+  .bar-label { min-width: 120px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Netlify Forms: hidden form for bot detection -->
+<form name="hackathon-survey" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input name="bot-field">
+  <input name="q1">
+  <input name="q2">
+  <input name="q3">
+  <input name="q4">
+  <input name="q3b">
+  <input name="q3c">
+  <input name="q5a">
+  <input name="q5">
+  <input name="sub">
+</form>
+
+<!-- Hero Visual -->
+<div class="hero-canvas-wrap">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-title-overlay">
+    <h1>UXI 해커톤 후속 설문</h1>
+    <p>UX Insight · 2026</p>
+  </div>
+</div>
+
+<!-- Login Gate -->
+<div class="container login-gate" id="loginGate">
+  <div class="login-box">
+    <p>설문에 참여하려면<br>접속 코드를 입력해주세요.</p>
+    <input class="login-input" id="loginInput" type="text" placeholder="접속 코드" autocomplete="off" spellcheck="false">
+    <div class="login-error" id="loginError">접속 코드가 올바르지 않습니다</div>
+    <button class="login-submit" id="loginSubmit">입장하기</button>
+  </div>
+  <div class="footer" style="margin-top:40px;">Powered by <strong>UX Insight</strong> · Built with Claude Code · <a href="javascript:void(0)" class="admin-link show-admin-modal">결과보기</a></div>
+</div>
+
+<!-- Survey Form -->
+<div class="container" id="surveyForm" style="display:none;">
+  <div class="header">
+    <h1>UXI 해커톤 후속 설문</h1>
+    <div class="header-desc">
+      이번 해커톤에 참여해주셔서 감사합니다.<br>
+      솔직한 답변이 다음을 더 잘 만드는 데 큰 도움이 됩니다.<br>
+      <strong>익명으로 진행됩니다.</strong>
+    </div>
+  </div>
+
+  <!-- Q1. 참여 경험 (첫인상) -->
+  <div class="q-card required" data-q="q1" data-type="radio">
+    <div class="q-number">Q1</div>
+    <div class="q-title">이번 해커톤 참여 경험을 한 마디로 표현하면?</div>
+    <div class="option-list">
+      <label class="option-item"><input type="radio" name="q1" value="기대 이상이었다"><span class="radio-mark"></span>기대 이상이었다</label>
+      <label class="option-item"><input type="radio" name="q1" value="나쁘지 않았다"><span class="radio-mark"></span>나쁘지 않았다</label>
+      <label class="option-item"><input type="radio" name="q1" value="그저 그랬다"><span class="radio-mark"></span>그저 그랬다</label>
+      <label class="option-item"><input type="radio" name="q1" value="아쉬움이 남았다"><span class="radio-mark"></span>아쉬움이 남았다</label>
+      <label class="option-item"><input type="radio" name="q1" value="솔직히 힘들었다"><span class="radio-mark"></span>솔직히 힘들었다</label>
+    </div>
+  </div>
+
+  <!-- Q2. 참여 동기 (왜 참여했는지) -->
+  <div class="q-card required" data-q="q4" data-type="checkbox">
+    <div class="q-number">Q2</div>
+    <div class="q-title">솔직히 말하면, 이번 참여는?</div>
+    <div class="q-subtitle">복수 선택 가능</div>
+    <div class="option-list">
+      <label class="option-item"><input type="checkbox" name="q4" value="자발적으로 참여하고 싶었다"><span class="check-mark">&#10003;</span>자발적으로 참여하고 싶었다</label>
+      <label class="option-item"><input type="checkbox" name="q4" value="분위기상 참여했다"><span class="check-mark">&#10003;</span>분위기상 참여했다</label>
+      <label class="option-item"><input type="checkbox" name="q4" value="해보니 생각보다 괜찮았다"><span class="check-mark">&#10003;</span>해보니 생각보다 괜찮았다</label>
+      <label class="option-item"><input type="checkbox" name="q4" value="역시 내 스타일은 아니었다"><span class="check-mark">&#10003;</span>역시 내 스타일은 아니었다</label>
+    </div>
+  </div>
+
+  <!-- Q3. 운영 방식 (운영 피드백) -->
+  <div class="q-card required" data-q="q5a" data-type="radio">
+    <div class="q-number">Q3</div>
+    <div class="q-title">해커톤 운영 방식(시간, 난이도, 진행 형태)은 적절했나요?</div>
+    <div class="option-list">
+      <label class="option-item"><input type="radio" name="q5a" value="적절했다"><span class="radio-mark"></span>적절했다</label>
+      <label class="option-item"><input type="radio" name="q5a" value="시간이 부족했다"><span class="radio-mark"></span>시간이 부족했다</label>
+      <label class="option-item"><input type="radio" name="q5a" value="난이도가 높았다"><span class="radio-mark"></span>난이도가 높았다</label>
+      <label class="option-item"><input type="radio" name="q5a" value="좀 더 자유로운 형식이면 좋겠다"><span class="radio-mark"></span>좀 더 자유로운 형식이면 좋겠다</label>
+    </div>
+  </div>
+
+  <!-- Q4. AI 심리적 부담 (AI 인식 시작) -->
+  <div class="q-card required" data-q="q2" data-type="radio">
+    <div class="q-number">Q4</div>
+    <div class="q-title">참여 전 AI에 대한 나의 심리적 부담은?</div>
+    <div class="option-list">
+      <label class="option-item"><input type="radio" name="q2" value="부담이 없었다"><span class="radio-mark"></span>부담이 없었다</label>
+      <label class="option-item"><input type="radio" name="q2" value="약간 있었다"><span class="radio-mark"></span>약간 있었다</label>
+      <label class="option-item"><input type="radio" name="q2" value="꽤 컸다"><span class="radio-mark"></span>꽤 컸다</label>
+    </div>
+  </div>
+
+  <!-- Q5. AI 허들 변화 -->
+  <div class="q-card required" data-q="q3b" data-type="radio">
+    <div class="q-number">Q5</div>
+    <div class="q-title">이번 해커톤을 계기로 AI의 허들을 얼마나 낮췄다고 생각하나요?</div>
+    <div class="option-list">
+      <label class="option-item"><input type="radio" name="q3b" value="많이 낮아졌다"><span class="radio-mark"></span>많이 낮아졌다</label>
+      <label class="option-item"><input type="radio" name="q3b" value="조금 낮아졌다"><span class="radio-mark"></span>조금 낮아졌다</label>
+      <label class="option-item"><input type="radio" name="q3b" value="잘 모르겠다"><span class="radio-mark"></span>잘 모르겠다</label>
+      <label class="option-item"><input type="radio" name="q3b" value="별로 달라지지 않았다"><span class="radio-mark"></span>별로 달라지지 않았다</label>
+      <label class="option-item"><input type="radio" name="q3b" value="달라지고 싶지 않다"><span class="radio-mark"></span>달라지고 싶지 않다</label>
+    </div>
+  </div>
+
+  <!-- Q6. AI 사용 의향 -->
+  <div class="q-card required" data-q="q3" data-type="radio">
+    <div class="q-number">Q6</div>
+    <div class="q-title">해커톤 이후 AI를 직접 써보고 싶다는 생각이 생겼나요?</div>
+    <div class="option-list">
+      <label class="option-item"><input type="radio" name="q3" value="더 써보고 싶어졌다"><span class="radio-mark"></span>더 써보고 싶어졌다</label>
+      <label class="option-item"><input type="radio" name="q3" value="아직은 잘 모르겠다"><span class="radio-mark"></span>아직은 잘 모르겠다</label>
+      <label class="option-item"><input type="radio" name="q3" value="크게 달라진 게 없다"><span class="radio-mark"></span>크게 달라진 게 없다</label>
+    </div>
+  </div>
+
+  <!-- Q7. 업무 생산성 아이템 -->
+  <div class="q-card required" data-q="q3c" data-type="radio">
+    <div class="q-number">Q7</div>
+    <div class="q-title">AI로 새로운 것을 만들어 보니, 업무 생산성을 높이는 아이템을 만들고 싶은 게 생겼나요?</div>
+    <div class="option-list">
+      <label class="option-item"><input type="radio" name="q3c" value="이미 구체적인 아이디어가 있다"><span class="radio-mark"></span>이미 구체적인 아이디어가 있다</label>
+      <label class="option-item"><input type="radio" name="q3c" value="막연하지만 뭔가 만들어보고 싶다"><span class="radio-mark"></span>막연하지만 뭔가 만들어보고 싶다</label>
+      <label class="option-item"><input type="radio" name="q3c" value="아직 잘 모르겠다"><span class="radio-mark"></span>아직 잘 모르겠다</label>
+      <label class="option-item"><input type="radio" name="q3c" value="관심 없다"><span class="radio-mark"></span>관심 없다</label>
+    </div>
+  </div>
+
+  <!-- Q8. 재참여 의향 (마무리) -->
+  <div class="q-card required" data-q="q5" data-type="radio">
+    <div class="q-number">Q8</div>
+    <div class="q-title">다음에 또 이런 자리가 생긴다면?</div>
+    <div class="option-list">
+      <label class="option-item"><input type="radio" name="q5" value="적극적으로 참여하고 싶다"><span class="radio-mark"></span>적극적으로 참여하고 싶다</label>
+      <label class="option-item"><input type="radio" name="q5" value="글쎄, 상황 봐서"><span class="radio-mark"></span>글쎄, 상황 봐서</label>
+      <label class="option-item"><input type="radio" name="q5" value="솔직히 부담스럽다"><span class="radio-mark"></span>솔직히 부담스럽다</label>
+    </div>
+  </div>
+
+  <!-- 주관식 -->
+  <div class="q-card" data-q="sub" data-type="text">
+    <div class="q-number">주관식</div>
+    <div class="q-title">이번 해커톤에서 가장 의미 있었던 순간은?</div>
+    <textarea class="q-textarea" name="sub" placeholder="자유롭게 적어주세요"></textarea>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-section">
+    <button class="submit-btn" id="submitBtn" type="button">제출하기</button>
+  </div>
+
+  <div class="footer">Powered by <strong>UX Insight</strong> · Built with Claude Code · <a href="javascript:void(0)" class="admin-link show-admin-modal">결과보기</a></div>
+</div>
+
+<!-- Thank you screen -->
+<div class="container thank-you" id="thankYou">
+  <h2>감사합니다!</h2>
+  <p>소중한 의견이 잘 전달되었습니다.<br>다음에 더 나은 자리로 찾아뵙겠습니다.</p>
+</div>
+
+<!-- Admin Dashboard -->
+<div class="container admin-page" id="adminPage">
+  <div class="admin-header">
+    <h2>설문 결과 대시보드</h2>
+    <div class="admin-actions">
+      <button class="admin-btn" id="csvBtn">CSV 다운로드</button>
+      <span class="admin-badge" id="totalCount">0건</span>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">총 응답</div></div>
+    <div class="stat-card"><div class="stat-value" id="statPositive">0%</div><div class="stat-label">긍정 응답 (Q1)</div></div>
+    <div class="stat-card"><div class="stat-value" id="statNext">0%</div><div class="stat-label">재참여 의향 (Q6)</div></div>
+  </div>
+  <div id="chartContainer"></div>
+  <div class="footer">Powered by <strong>UX Insight</strong> · Built with Claude Code · <a href="javascript:void(0)" id="backToSurvey" class="admin-link">설문으로 돌아가기</a></div>
+</div>
+
+<!-- Password Modal -->
+<div class="pw-modal" id="pwModal">
+  <div class="pw-box">
+    <h3>관리자 인증</h3>
+    <p>결과 대시보드는 비밀번호가 필요합니다</p>
+    <input class="pw-input" id="pwInput" type="password" placeholder="비밀번호" autocomplete="off">
+    <div class="pw-error" id="pwError">비밀번호가 틀렸습니다</div>
+    <button class="pw-submit" id="pwSubmit">확인</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  // ─── Config ───
+  const ADMIN_PW = 'uxi0000';  // 관리자 비밀번호 (변경 가능)
+
+  // ─── Question metadata ───
+  const QUESTIONS = {
+    q1: { title: '해커톤 참여 경험', options: ['기대 이상이었다','나쁘지 않았다','그저 그랬다','아쉬움이 남았다','솔직히 힘들었다'] },
+    q2: { title: 'AI 심리적 부담', options: ['부담이 없었다','약간 있었다','꽤 컸다'] },
+    q3: { title: 'AI 사용 의향', options: ['더 써보고 싶어졌다','아직은 잘 모르겠다','크게 달라진 게 없다'] },
+    q3b: { title: 'AI 허들 변화', options: ['많이 낮아졌다','조금 낮아졌다','잘 모르겠다','별로 달라지지 않았다','달라지고 싶지 않다'] },
+    q3c: { title: '업무 생산성 아이템 의향', options: ['이미 구체적인 아이디어가 있다','막연하지만 뭔가 만들어보고 싶다','아직 잘 모르겠다','관심 없다'] },
+    q5a: { title: '운영 방식 만족도', options: ['적절했다','시간이 부족했다','난이도가 높았다','좀 더 자유로운 형식이면 좋겠다'] },
+    q4: { title: '참여 동기 (복수)', options: ['자발적으로 참여하고 싶었다','분위기상 참여했다','해보니 생각보다 괜찮았다','역시 내 스타일은 아니었다'] },
+    q5: { title: '재참여 의향', options: ['적극적으로 참여하고 싶다','글쎄, 상황 봐서','솔직히 부담스럽다'] },
+  };
+
+  // ─── Route ───
+  const params = new URLSearchParams(location.search);
+  if (params.get('admin') !== null) {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('surveyForm').style.display = 'none';
+    document.getElementById('pwModal').classList.add('visible');
+    initAdmin();
+    return;
+  }
+
+  // ─── 중복 제출 방지 ───
+  if (localStorage.getItem('survey_submitted')) {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('surveyForm').style.display = 'none';
+    document.getElementById('thankYou').style.display = 'block';
+    document.querySelector('.thank-you p').innerHTML = '이미 설문에 참여하셨습니다.<br>소중한 의견 감사합니다.';
+    return;
+  }
+
+  // ─── Login Gate ───
+  const loginInput = document.getElementById('loginInput');
+  const loginSubmit = document.getElementById('loginSubmit');
+  const loginError = document.getElementById('loginError');
+
+  function tryAccess() {
+    if (loginInput.value.trim().toUpperCase() === 'UXI') {
+      document.getElementById('loginGate').style.display = 'none';
+      document.getElementById('surveyForm').style.display = '';
+    } else {
+      loginError.style.display = 'block';
+      loginInput.value = '';
+      loginInput.focus();
+      setTimeout(() => loginError.style.display = 'none', 2000);
+    }
+  }
+
+  loginSubmit.addEventListener('click', tryAccess);
+  loginInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryAccess(); });
+  setTimeout(() => loginInput.focus(), 100);
+
+  // ─── 결과보기 → 모달 ───
+  document.querySelectorAll('.show-admin-modal').forEach(link => {
+    link.addEventListener('click', () => {
+      document.getElementById('pwModal').classList.add('visible');
+      initAdmin();
+    });
+  });
+
+  // ─── Radio & Checkbox selection ───
+  document.querySelectorAll('.option-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = item.querySelector('input');
+      if (input.type === 'radio') {
+        item.closest('.option-list').querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        input.checked = true;
+      } else {
+        const newState = !input.checked;
+        input.checked = newState;
+        item.classList.toggle('selected', newState);
+      }
+    });
+  });
+
+  // ─── Toast ───
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // ─── Submit via Netlify Forms ───
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('submitBtn');
+
+    // Validate required radios
+    const requiredRadios = ['q1', 'q2', 'q3', 'q3b', 'q3c', 'q5a', 'q5'];
+    for (const name of requiredRadios) {
+      if (!document.querySelector(`input[name="${name}"]:checked`)) {
+        const card = document.querySelector(`[data-q="${name}"]`);
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.style.borderColor = '#ff3b30';
+        setTimeout(() => card.style.borderColor = '', 2000);
+        showToast('필수 항목을 선택해주세요');
+        return;
+      }
+    }
+
+    // Validate Q4 (checkbox)
+    if (!document.querySelector('input[name="q4"]:checked')) {
+      const card = document.querySelector('[data-q="q4"]');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.style.borderColor = '#ff3b30';
+      setTimeout(() => card.style.borderColor = '', 2000);
+      showToast('필수 항목을 선택해주세요');
+      return;
+    }
+
+    if (!confirm('이대로 제출하시겠습니까?')) return;
+
+    btn.disabled = true;
+    btn.textContent = '제출 중...';
+
+    // Build form data
+    const formData = new URLSearchParams();
+    formData.append('form-name', 'hackathon-survey');
+    requiredRadios.forEach(name => {
+      formData.append(name, document.querySelector(`input[name="${name}"]:checked`).value);
+    });
+    const q4Values = Array.from(document.querySelectorAll('input[name="q4"]:checked')).map(el => el.value);
+    formData.append('q4', q4Values.join(', '));
+    formData.append('sub', document.querySelector('textarea[name="sub"]').value);
+
+    try {
+      const res = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString()
+      });
+      if (res.ok) {
+        localStorage.setItem('survey_submitted', 'true');
+        document.getElementById('surveyForm').style.display = 'none';
+        document.getElementById('thankYou').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error('서버 오류');
+      }
+    } catch (err) {
+      // Netlify가 아닌 환경에서도 localStorage에 저장
+      const entry = { timestamp: new Date().toISOString() };
+      requiredRadios.forEach(name => {
+        entry[name] = document.querySelector(`input[name="${name}"]:checked`).value;
+      });
+      entry.q4 = q4Values.join(', ');
+      entry.sub = document.querySelector('textarea[name="sub"]').value;
+
+      const stored = JSON.parse(localStorage.getItem('survey_responses') || '[]');
+      stored.push(entry);
+      localStorage.setItem('survey_responses', JSON.stringify(stored));
+      localStorage.setItem('survey_submitted', 'true');
+
+      document.getElementById('surveyForm').style.display = 'none';
+      document.getElementById('thankYou').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  // ─── Admin ───
+  function initAdmin() {
+    const pwInput = document.getElementById('pwInput');
+    const pwSubmit = document.getElementById('pwSubmit');
+    const pwError = document.getElementById('pwError');
+
+    function tryLogin() {
+      if (pwInput.value === ADMIN_PW) {
+        document.getElementById('pwModal').classList.remove('visible');
+        document.getElementById('loginGate').style.display = 'none';
+        document.getElementById('surveyForm').style.display = 'none';
+        document.getElementById('adminPage').classList.add('visible');
+        renderDashboard();
+      } else {
+        pwError.style.display = 'block';
+        pwInput.value = '';
+        pwInput.focus();
+        setTimeout(() => pwError.style.display = 'none', 2000);
+      }
+    }
+
+    pwSubmit.addEventListener('click', tryLogin);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+    setTimeout(() => pwInput.focus(), 100);
+
+    // Back to survey
+    document.getElementById('backToSurvey').addEventListener('click', () => {
+      document.getElementById('adminPage').classList.remove('visible');
+      document.getElementById('loginGate').style.display = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // CSV download
+    document.getElementById('csvBtn').addEventListener('click', () => {
+      const responses = JSON.parse(localStorage.getItem('survey_responses') || '[]');
+      if (!responses.length) { showToast('응답 데이터가 없습니다'); return; }
+      const headers = ['timestamp','q1','q4','q5a','q2','q3b','q3','q3c','q5','sub'];
+      let csv = headers.join(',') + '\n';
+      responses.forEach(r => {
+        csv += headers.map(h => '"' + (r[h] || '').replace(/"/g, '""') + '"').join(',') + '\n';
+      });
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'hackathon_survey_results.csv';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    });
+  }
+
+  function renderDashboard() {
+    const responses = JSON.parse(localStorage.getItem('survey_responses') || '[]');
+    const total = responses.length;
+
+    // Stats
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('totalCount').textContent = total + '건';
+
+    if (total > 0) {
+      const positive = responses.filter(r => r.q1 === '기대 이상이었다' || r.q1 === '나쁘지 않았다').length;
+      document.getElementById('statPositive').textContent = Math.round(positive / total * 100) + '%';
+
+      const nextYes = responses.filter(r => r.q5 === '적극적으로 참여하고 싶다' || r.q5 === '참여는 하겠다').length;
+      document.getElementById('statNext').textContent = Math.round(nextYes / total * 100) + '%';
+    }
+
+    // Charts
+    const container = document.getElementById('chartContainer');
+    container.innerHTML = '';
+
+    // Bar charts for each question
+    ['q1','q4','q5a','q2','q3b','q3','q3c','q5'].forEach(qKey => {
+      const q = QUESTIONS[qKey];
+      const card = document.createElement('div');
+      card.className = 'chart-card';
+
+      let html = `<div class="chart-title">${q.title}</div>`;
+      q.options.forEach(opt => {
+        let count;
+        if (qKey === 'q4') {
+          count = responses.filter(r => r.q4 && r.q4.includes(opt)).length;
+        } else {
+          count = responses.filter(r => r[qKey] === opt).length;
+        }
+        const pct = total > 0 ? Math.round(count / total * 100) : 0;
+        html += `<div class="bar-row">
+          <span class="bar-label">${opt}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <span class="bar-value">${count}명 (${pct}%)</span>
+        </div>`;
+      });
+      card.innerHTML = html;
+      container.appendChild(card);
+    });
+
+    // Text responses: 주관식
+    const subCard = document.createElement('div');
+    subCard.className = 'chart-card';
+    subCard.innerHTML = '<div class="chart-title">주관식. 가장 의미 있었던 순간</div><div class="text-responses">' +
+      (responses.filter(r => r.sub).length > 0
+        ? responses.filter(r => r.sub).map(r => `<div class="text-response">${escHtml(r.sub)}</div>`).join('')
+        : '<div class="text-response empty">아직 응답이 없습니다</div>') +
+      '</div>';
+    container.appendChild(subCard);
+
+  }
+
+  function escHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+})();
+</script>
+
+<script>
+// ── Hero Canvas ───────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('heroCanvas');
+  const ctx    = canvas.getContext('2d');
+
+  let cW = window.innerWidth, cH = 280;
+
+  function resize() {
+    cW = window.innerWidth;
+    cH = canvas.parentElement.offsetHeight || 280;
+    canvas.width  = cW * window.devicePixelRatio;
+    canvas.height = cH * window.devicePixelRatio;
+    ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const W = () => cW;
+  const H = () => cH;
+
+  // ── Stars ─────────────────────────────────────────────────
+  const stars = Array.from({ length: 80 }, () => ({
+    x: Math.random(), y: Math.random(),
+    r: 0.4 + Math.random() * 1.0,
+    a: 0.15 + Math.random() * 0.5,
+    tw: Math.random() * Math.PI * 2,
+    tws: 0.008 + Math.random() * 0.015,
+  }));
+
+  // ── ASCII particles (sparse, subtle) ──────────────────────
+  const ASCII = '01 10 {} [] () <> // \\\\ ++ == !! ?? ## @@'.split(' ').filter(Boolean);
+  const particles = Array.from({ length: 28 }, () => ({
+    x:  Math.random(),
+    y:  Math.random(),
+    vx: (Math.random() - 0.5) * 0.0003,
+    vy: 0.00015 + Math.random() * 0.0003,
+    ch: ASCII[Math.floor(Math.random() * ASCII.length)],
+    sz: 10 + Math.random() * 6,
+    a:  0.06 + Math.random() * 0.18,
+    tw: Math.random() * Math.PI * 2,
+    tws: 0.012 + Math.random() * 0.02,
+  }));
+
+  // ── Claude pixel character ────────────────────────────────
+  // pixel map: 1=body, 2=eye(dark), 0=empty
+  const SPRITE = [
+    [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+    [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,2,2,1,1,1,1,2,2,1,1,1],
+    [1,1,1,2,2,1,1,1,1,2,2,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [0,1,1,0,0,1,1,0,0,1,1,0,1,0],
+    [0,1,1,0,0,1,1,0,0,1,1,0,1,0],
+  ];
+  // walk animation: legs shift down on alternate frames
+  const SPRITE_WALK = [
+    [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+    [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,2,2,1,1,1,1,2,2,1,1,1],
+    [1,1,1,2,2,1,1,1,1,2,2,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [0,0,0,1,1,0,0,1,1,0,0,1,0,0],
+    [0,0,0,1,1,0,0,1,1,0,0,1,0,0],
+  ];
+
+  const BODY_COLOR = '#C87D55';
+  const EYE_COLOR  = '#1a0f08';
+
+  function drawClaude(x, y, px, dir, frame) {
+    const sprite = frame % 16 < 8 ? SPRITE : SPRITE_WALK;
+    ctx.save();
+    if (dir < 0) {
+      ctx.translate(x + SPRITE[0].length * px, y);
+      ctx.scale(-1, 1);
+    } else {
+      ctx.translate(x, y);
+    }
+    sprite.forEach((row, ri) => {
+      row.forEach((col, ci) => {
+        if (col === 1) {
+          ctx.fillStyle = BODY_COLOR;
+          ctx.fillRect(ci * px, ri * px, px, px);
+        } else if (col === 2) {
+          ctx.fillStyle = EYE_COLOR;
+          ctx.fillRect(ci * px, ri * px, px, px);
+        }
+      });
+    });
+    ctx.restore();
+  }
+
+  // Claude crawlers
+  function makeCrawler(randomX = true) {
+    const dir = Math.random() < 0.5 ? 1 : -1;
+    const px  = 4 + Math.floor(Math.random() * 3); // pixel size 4~6
+    return {
+      x:     randomX ? Math.random() * W() : (dir > 0 ? -(SPRITE[0].length * 6 + 10) : W() + 10),
+      y:     H() * (0.70 + Math.random() * 0.20),
+      vx:    dir * (0.5 + Math.random() * 0.7),
+      dir,
+      px,
+      frame: Math.floor(Math.random() * 32),
+    };
+  }
+  const crawlers = Array.from({ length: 4 }, () => makeCrawler(true));
+
+  // ── Animate ────────────────────────────────────────────────
+  let t = 0;
+  function draw() {
+    requestAnimationFrame(draw);
+    t += 0.016;
+    const w = W(), h = H();
+
+    ctx.fillStyle = '#03020a';
+    ctx.fillRect(0, 0, w, h);
+
+    // stars
+    stars.forEach(s => {
+      s.tw += s.tws;
+      ctx.beginPath();
+      ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${s.a * (0.6 + 0.4 * Math.sin(s.tw))})`;
+      ctx.fill();
+    });
+
+    // ASCII (very subtle)
+    ctx.textAlign = 'center';
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.tw += p.tws;
+      if (p.y > 1.05) p.y = -0.05;
+      if (p.x < -0.05) p.x = 1.05;
+      if (p.x > 1.05)  p.x = -0.05;
+      const a = p.a * (0.6 + 0.4 * Math.sin(p.tw));
+      ctx.font = `${p.sz}px monospace`;
+      ctx.fillStyle = `rgba(160,200,255,${a})`;
+      ctx.fillText(p.ch, p.x * w, p.y * h);
+    });
+
+    // Claude crawlers
+    crawlers.forEach((c, i) => {
+      c.x += c.vx;
+      c.frame++;
+      const charW = SPRITE[0].length * c.px;
+      const charH = SPRITE.length    * c.px;
+      drawClaude(c.x, c.y - charH, c.px, c.dir, c.frame);
+      if (c.x > w + charW + 10 || c.x < -(charW + 10)) {
+        crawlers[i] = makeCrawler(false);
+      }
+    });
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
