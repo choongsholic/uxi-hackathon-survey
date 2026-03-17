@@ -232,7 +232,10 @@ body {
 .pw-error { color: #ff3b30; font-size: 12px; margin-top: 8px; display: none; }
 
 @media (max-width: 600px) {
-  .stat-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat-card { padding: 14px 8px; }
+  .stat-value { font-size: 22px; }
+  .stat-label { font-size: 10px; }
   .bar-row { flex-wrap: wrap; gap: 6px; }
   .bar-label { width: 100%; min-width: unset; font-size: 13px; margin-bottom: 2px; }
   .bar-track { flex: 1; }
