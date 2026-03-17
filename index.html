@@ -171,7 +171,6 @@ body {
 .survey-readonly .option-item { pointer-events: none; opacity: 0.5; }
 .survey-readonly .q-textarea { pointer-events: none; opacity: 0.5; background: #f5f5f7; }
 .survey-readonly .submit-btn { display: none; }
-.survey-readonly .gallery-toggle { pointer-events: none; }
 .readonly-banner {
   background: #f5f5f7; border: 1px solid #e5e5e7; border-radius: 12px;
   padding: 14px 20px; margin-bottom: 16px; font-size: 13px; color: #86868b;
@@ -218,8 +217,8 @@ body {
 .admin-btn:hover { border-color: #1d1d1f; }
 
 /* Admin link */
-.admin-link { font-size: inherit; color: #c7c7cc; text-decoration: none; }
-.admin-link:hover { color: #86868b; text-decoration: underline; }
+.admin-link { font-size: inherit; color: #86868b; text-decoration: none; }
+.admin-link:hover { color: #555; text-decoration: underline; }
 
 /* Survey login gate */
 .login-gate { text-align: center; padding: 60px 20px 80px; }
@@ -471,10 +470,10 @@ body {
 
   // ─── 결과보기 모달 (모든 화면에서 동작) ───
   document.querySelectorAll('.show-admin-modal').forEach(link => {
-    link.addEventListener('click', () => {
+    link.onclick = () => {
       document.getElementById('pwModal').classList.add('visible');
       initAdmin();
-    });
+    };
   });
 
   // ─── 중복 제출 방지 ───
