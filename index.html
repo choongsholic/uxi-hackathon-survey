@@ -296,20 +296,9 @@ body {
     </div>
   </div>
 
-  <!-- Q4. AI 심리적 부담 (AI 인식 시작) -->
-  <div class="q-card required" data-q="q2" data-type="radio">
-    <div class="q-number">Q3</div>
-    <div class="q-title">참여 전 AI에 대한 나의 심리적 부담은?</div>
-    <div class="option-list">
-      <label class="option-item"><input type="radio" name="q2" value="부담이 없었다"><span class="radio-mark"></span>부담이 없었다</label>
-      <label class="option-item"><input type="radio" name="q2" value="약간 있었다"><span class="radio-mark"></span>약간 있었다</label>
-      <label class="option-item"><input type="radio" name="q2" value="꽤 컸다"><span class="radio-mark"></span>꽤 컸다</label>
-    </div>
-  </div>
-
-  <!-- Q5. AI 허들 변화 -->
+  <!-- Q3. AI 허들 변화 -->
   <div class="q-card required" data-q="q3b" data-type="radio">
-    <div class="q-number">Q4</div>
+    <div class="q-number">Q3</div>
     <div class="q-title">이번 해커톤을 계기로 AI의 허들을 얼마나 낮췄다고 생각하나요?</div>
     <div class="option-list">
       <label class="option-item"><input type="radio" name="q3b" value="많이 낮아졌다"><span class="radio-mark"></span>많이 낮아졌다</label>
@@ -322,7 +311,7 @@ body {
 
   <!-- Q6. AI 사용 의향 -->
   <div class="q-card required" data-q="q3" data-type="radio">
-    <div class="q-number">Q5</div>
+    <div class="q-number">Q4</div>
     <div class="q-title">해커톤 이후 AI를 직접 써보고 싶다는 생각이 생겼나요?</div>
     <div class="option-list">
       <label class="option-item"><input type="radio" name="q3" value="더 써보고 싶어졌다"><span class="radio-mark"></span>더 써보고 싶어졌다</label>
@@ -333,7 +322,7 @@ body {
 
   <!-- Q7. 업무 생산성 아이템 -->
   <div class="q-card required" data-q="q3c" data-type="radio">
-    <div class="q-number">Q6</div>
+    <div class="q-number">Q5</div>
     <div class="q-title">AI로 새로운 것을 만들어 보니, 업무 생산성을 높이는 아이템을 만들고 싶은 게 생겼나요?</div>
     <div class="option-list">
       <label class="option-item"><input type="radio" name="q3c" value="이미 구체적인 아이디어가 있다"><span class="radio-mark"></span>이미 구체적인 아이디어가 있다</label>
@@ -345,7 +334,7 @@ body {
 
   <!-- Q8. 재참여 의향 (마무리) -->
   <div class="q-card required" data-q="q5" data-type="radio">
-    <div class="q-number">Q7</div>
+    <div class="q-number">Q6</div>
     <div class="q-title">다음에 또 이런 자리가 생긴다면?</div>
     <div class="option-list">
       <label class="option-item"><input type="radio" name="q5" value="적극적으로 참여하고 싶다"><span class="radio-mark"></span>적극적으로 참여하고 싶다</label>
@@ -434,7 +423,6 @@ body {
   // ─── Question metadata ───
   const QUESTIONS = {
     q1: { title: '해커톤 참여 경험', options: ['기대 이상이었다','나쁘지 않았다','그저 그랬다','아쉬움이 남았다','솔직히 힘들었다'] },
-    q2: { title: 'AI 심리적 부담', options: ['부담이 없었다','약간 있었다','꽤 컸다'] },
     q3: { title: 'AI 사용 의향', options: ['더 써보고 싶어졌다','아직은 잘 모르겠다','크게 달라진 게 없다'] },
     q3b: { title: 'AI 허들 변화', options: ['많이 낮아졌다','조금 낮아졌다','잘 모르겠다','별로 달라지지 않았다','달라지고 싶지 않다'] },
     q3c: { title: '업무 생산성 아이템 의향', options: ['이미 구체적인 아이디어가 있다','막연하지만 뭔가 만들어보고 싶다','아직 잘 모르겠다','관심 없다'] },
@@ -531,8 +519,7 @@ body {
     const btn = document.getElementById('submitBtn');
 
     // Validate required radios
-    const requiredRadios = ['q1', 'q2', 'q3', 'q3b', 'q3c', 'q5a', 'q5'];
-    // q4 제거됨
+    const requiredRadios = ['q1', 'q3', 'q3b', 'q3c', 'q5a', 'q5'];
     for (const name of requiredRadios) {
       if (!document.querySelector(`input[name="${name}"]:checked`)) {
         const card = document.querySelector(`[data-q="${name}"]`);
@@ -635,7 +622,7 @@ body {
       md += `> 총 응답: ${total}건\n`;
       md += `> 다운로드 일시: ${new Date().toLocaleString('ko-KR')}\n\n---\n\n`;
 
-      const qOrder = ['q1','q5a','q2','q3b','q3','q3c','q5'];
+      const qOrder = ['q1','q5a','q3b','q3','q3c','q5'];
       qOrder.forEach(qKey => {
         const q = QUESTIONS[qKey];
         md += `## ${q.title}\n\n`;
@@ -695,7 +682,7 @@ body {
     container.innerHTML = '';
 
     // Bar charts for each question
-    ['q1','q5a','q2','q3b','q3','q3c','q5'].forEach(qKey => {
+    ['q1','q5a','q3b','q3','q3c','q5'].forEach(qKey => {
       const q = QUESTIONS[qKey];
       const card = document.createElement('div');
       card.className = 'chart-card';
