@@ -429,6 +429,7 @@ body {
 (function() {
   // ─── Config ───
   const ADMIN_PW = 'uxi0000';  // 관리자 비밀번호 (변경 가능)
+  const SHARE_TOKEN = 'uxi-result-2026';
 
   // ─── Question metadata ───
   const QUESTIONS = {
@@ -443,6 +444,16 @@ body {
 
   // ─── Route ───
   const params = new URLSearchParams(location.search);
+
+  // 공유 링크로 접근 시 비밀번호 없이 바로 결과 페이지 표시
+  if (params.get('share') === SHARE_TOKEN) {
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('surveyForm').style.display = 'none';
+    document.getElementById('adminPage').classList.add('visible');
+    renderDashboard();
+    return;
+  }
+
   if (params.get('admin') !== null) {
     document.getElementById('loginGate').style.display = 'none';
     document.getElementById('surveyForm').style.display = 'none';
@@ -601,34 +612,12 @@ body {
 
     // Share
     document.getElementById('shareBtn').addEventListener('click', async () => {
-      let responses = [];
+      const shareUrl = `${location.origin}${location.pathname}?share=${SHARE_TOKEN}`;
       try {
-        const res = await fetch('/api/responses');
-        if (res.ok) responses = await res.json();
-      } catch (e) { /* empty */ }
-
-      const total = responses.length;
-      if (!total) { showToast('아직 응답 데이터가 없습니다'); return; }
-
-      const positive = responses.filter(r => r.q1 === '기대 이상이었다' || r.q1 === '나쁘지 않았다').length;
-      const nextYes = responses.filter(r => r.q5 === '적극적으로 참여하고 싶다').length;
-      const aiUp = responses.filter(r => r.q3b === '많이 낮아졌다' || r.q3b === '조금 낮아졌다').length;
-
-      const text = [
-        '📊 UXI 해커톤 후속 설문 결과',
-        `• 총 응답: ${total}명`,
-        `• 긍정 경험: ${Math.round(positive / total * 100)}%`,
-        `• AI 허들 낮아짐: ${Math.round(aiUp / total * 100)}%`,
-        `• 재참여 의향: ${Math.round(nextYes / total * 100)}%`,
-      ].join('\n');
-
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: 'UXI 해커톤 설문 결과', text });
-        } catch (e) { /* 사용자 취소 */ }
-      } else {
-        await navigator.clipboard.writeText(text);
-        showToast('결과 요약이 클립보드에 복사됐습니다');
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('결과 링크가 복사됐습니다');
+      } catch (e) {
+        prompt('아래 링크를 복사하세요', shareUrl);
       }
     });
 
